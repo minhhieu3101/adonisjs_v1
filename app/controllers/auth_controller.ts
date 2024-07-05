@@ -12,8 +12,6 @@ export default class AuthController {
     try {
         const data = request.body()
         const payload = await registerValidator.validate(data)
-        console.log('register');
-        
         return await this.userService.store(payload)
     } catch (error) {
         console.log(error);
@@ -22,11 +20,11 @@ export default class AuthController {
         }
     }
 
-    async login({request,auth} : HttpContext){
+    async login({request} : HttpContext){
         try {
             const data = request.body()
             const payload = await loginValidator.validate(data)
-            return await this.userService.login(payload, auth)
+            return await this.userService.login(payload)
         } catch (error) {
             throw error
         }

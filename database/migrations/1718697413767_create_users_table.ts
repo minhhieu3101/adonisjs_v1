@@ -1,4 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+import { ModelStatus, RoleEnum } from '../../types/enum.js'
 
 export default class extends BaseSchema {
   protected tableName = 'users'
@@ -11,8 +12,9 @@ export default class extends BaseSchema {
       table.string('password').notNullable()
       table.string('phone_number').notNullable()
       table.string('address').notNullable()
+      table.string('role').notNullable().defaultTo(RoleEnum.user)
+      table.string('status').notNullable().defaultTo(ModelStatus.active)
       table.timestamp('dob').nullable
-      table.boolean('is_activated').notNullable().defaultTo(false)
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
     })

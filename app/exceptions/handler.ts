@@ -41,7 +41,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     if (error instanceof validateError.errors.E_VALIDATION_ERROR) {
       return ctx.response.status(422).send({
         message: 'Validation failed',
-        errors: error.message
+        errors: error
       })
     }
 

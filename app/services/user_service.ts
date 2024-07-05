@@ -1,51 +1,36 @@
 import User from "#models/user";
+import env from "#start/env";
 import db from '@adonisjs/lucid/services/db'
-import { Authenticator } from "@adonisjs/auth";
-import { Authenticators } from "@adonisjs/auth/types";
-
-export default class UsersService {
-
+import { DatabaseService } from "./database_service.js";
+export default class UsersService extends DatabaseService<typeof User> {
+  constructor(){
+    super(User)
+  }
   async index(pagination: any) {
     const {perPage, page} = pagination
     const users = await db.from('users').paginate(page, perPage)
     return users
   }
 
-  async store(user: any): Promise<User> {
-    return await User.create({
-        fullName: user.fullName,
-        email: user.email,
-        password: user.password,
-        address: user.address,
-        phoneNumber: user.phoneNumber,
-        dob: user.dob
-    })
-  }
-
-  async login(user:any, auth: Authenticator<Authenticators>) : Promise<Object> {
+  async login(user:any) : Promise<Object> {
     const {email, password} = user
     const userdb = await User.verifyCredentials(email, password)
-    return await auth.use('jwt').generate(userdb)
+    // const refreshToken = await redis.get(`user:${userdb.id}:refreshToken`)
+    const accessToken = await User.accessTokens.create(userdb, [], {
+      expiresIn: env.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
+    })
+    return accessToken
+    // if(refreshToken){
+    //   return {
+    //     accessToken: accessToken,
+    //     refreshToken: refreshToken
+    //   }
+    // }else{
+    //   const newRefreshToken = await User.accessTokens.create(userdb, [], {
+    //     expiresIn: env.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')
+    //   })
+    //   await redis.set(`user:${userdb.id}:refreshToken`, newRefreshToken.toJSON().token as string)
+      
+    // }
   }
-
-  /**
-   * Show individual record
-   */
-  async show() {}
-
-  /**
-   * Edit individual record
-   */
-  async edit() {}
-
-  /**
-   * Handle form submission for the edit action
-   */
-  async update(info: any) {
-  }
-
-  /**
-   * Delete record
-   */
-  async destroy() {}
 }

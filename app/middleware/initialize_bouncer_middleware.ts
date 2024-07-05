@@ -11,10 +11,6 @@ import type { NextFn } from '@adonisjs/core/types/http'
  */
 export default class InitializeBouncerMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
-    /**
-     * Create bouncer instance for the ongoing HTTP request.
-     * We will pull the user from the HTTP context.
-     */
     ctx.bouncer = new Bouncer(
       () => ctx.auth.user || null,
       abilities,

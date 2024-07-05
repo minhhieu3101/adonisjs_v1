@@ -1,24 +1,20 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, beforeCreate, column, hasOne } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
-import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import parseDuration from 'parse-duration'
 import { randomUUID } from 'crypto'
-import Role from './role.js'
-import type { HasOne } from '@adonisjs/lucid/types/relations'
+import { JwtAccessTokenProvider, JwtSecret } from '#providers/jwt_access_token_provider'
+import { ModelStatus, RoleEnum } from '../../types/enum.js'
+import ModelUtil from './model_util.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
   passwordColumnName: 'password',
 })
 
-export default class User extends compose(BaseModel, AuthFinder) {
-
-  static selfAssignPrimaryKey = true
-
-  @column({ isPrimary: true })
-  declare id: string
+export default class User extends compose(ModelUtil, AuthFinder) {
 
   @column({columnName: 'full_name'})
   declare fullName: string | null
@@ -37,29 +33,19 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column.date()
   declare dob: DateTime | null
-  
+
   @column()
-  declare is_activated: boolean
+  declare role: RoleEnum
 
-  @hasOne(() => Role)
-  declare profile: HasOne<typeof Role>
+  @column()
+  declare status: ModelStatus
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-
-  @beforeCreate()
-  static assignUuid(user: User) {
-    user.id = randomUUID()
-  }
-
-  static accessTokens = DbAccessTokensProvider.forModel(User,{
-    expiresIn: '30 days',
-    prefix: 'oat_',
-    table: 'auth_access_tokens',
-    type: 'jwt',
-    tokenSecretLength: 40,
+  static accessTokens = JwtAccessTokenProvider.forModel(User, {
+    expiresInMillis: parseDuration('1 day')!,
+    key: new JwtSecret('BjBZ-s9JFJTBwUsOo1Ml-fzkCqja_byX'),
+    primaryKey: 'id',
+    algorithm: 'HS256',
+    audience: 'https://client.example.com',
+    issuer: 'https://server.example.com',
   })
 }
