@@ -1,6 +1,7 @@
 import Product from '#models/product'
 import ProductPolicy from '#policies/product_policy'
 import ProductService from '#services/product_service'
+import { updateCategoryValidator } from '#validators/category'
 import { createProductValidator } from '#validators/product'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -69,11 +70,10 @@ export default class ProductsController {
 
   async update({ bouncer, response, params, request }: HttpContext) {
     try {
-      console.log(params.id)
-
       if (await bouncer.with(ProductPolicy).denies('update')) {
         return response.unauthorized({ message: 'Unauthorized' })
       }
+      await updateCategoryValidator.validate(request.body())
       return await this.productService.update(params.id, request.body())
     } catch (error) {
       throw error

@@ -1,6 +1,7 @@
 
 import UserPolicy from '#policies/user_policy';
 import UsersService from '#services/user_service';
+import { updateUserValidator, verifyUserValidator } from '#validators/user';
 import { inject } from '@adonisjs/core';
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -28,23 +29,16 @@ export default class UsersController {
 
   async verifyUser({ request }: HttpContext) {
     try {
-      const {email, otp} = request.only(['email', 'otp'])
-      return await this.userService.verify(otp, email)
+      const payload = await verifyUserValidator.validate(request.only(['email', 'otp']))
+      return await this.userService.verify(payload)
     } catch(error){
       throw error
     }
   }
 
-  async update({ params, request }: HttpContext) {
+  async update({auth, request}: HttpContext) {
     try {
-      return await this.userService.update(params.id, request.body())
-    } catch (error) {
-      throw error
-    }
-  }
-
-  async edit({auth, request}: HttpContext) {
-    try {
+      await updateUserValidator.validate(request.body())
       return await this.userService.update(auth.user?.$original.id, request.body())
     } catch (error) {
       throw error

@@ -18,9 +18,7 @@ router
       .use(middleware.pagination())
     router.resource('category', CategoriesController).apiOnly()
     router.resource('product', ProductsController).apiOnly()
-    router.resource('order', OrdersController).apiOnly().except(['store', 'index'])
-    router.post('/order/:productId', [() => import('#controllers/orders_controller'), 'store'])
-    router.get('/categorys', [() => import('#controllers/categories_controller'), 'showAll'])
+    router.resource('order', OrdersController).apiOnly()
     router.get('/product/category/:categoryId', [
       () => import('#controllers/products_controller'),
       'getProductFromCategory',

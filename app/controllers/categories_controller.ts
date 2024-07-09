@@ -1,6 +1,7 @@
 import Category from '#models/category';
 import CategoryPolicy from '#policies/category_policy';
 import CategoryService from '#services/category_service';
+import { createCategoryValidator, updateCategoryValidator } from '#validators/category';
 import { inject } from '@adonisjs/core';
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -21,7 +22,9 @@ export default class CategoriesController {
       if (await bouncer.with(CategoryPolicy).denies('store')) {
         return response.unauthorized({message: 'Unauthorized'})
       }
-      return await this.categoryService.store(request.body())
+
+      const payload = await createCategoryValidator.validate(request.body())
+      return await this.categoryService.store(payload)
     } catch (error) {
       throw error
     }
@@ -35,19 +38,12 @@ export default class CategoriesController {
     }
   }
 
-  async showAll() {
-    try {
-      return await this.categoryService.findAll()
-    } catch (error) {
-      throw error
-    }
-  }
-
   async update({bouncer, response, params, request }: HttpContext) {
     try {
       if (await bouncer.with(CategoryPolicy).denies('update')) {
         return response.unauthorized({message: 'Unauthorized'})
       }
+      await updateCategoryValidator.validate(request.body())
       return await this.categoryService.update(params.id, request.body())
     } catch (error) {
       throw error

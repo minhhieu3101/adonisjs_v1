@@ -14,7 +14,8 @@ export default class UsersService extends DatabaseService<typeof User> {
     return users
   }
 
-  async verify(otp: number | string, email: string){
+  async verify(payload: any){
+    const {otp,email} = payload
     const user = await this.getModel().findByOrFail('email', email)
     if(user.status === ModelStatus.active){
       throw new Error(`This email ${user.email} is already active`)
@@ -22,7 +23,7 @@ export default class UsersService extends DatabaseService<typeof User> {
     if(!user){
       throw new Error('Can not find this user')
     }
-    if(user.otp != otp){
+    if(user.otp !== otp){
       throw new Error('This OTP is wrong')
     }
     user.status = ModelStatus.active

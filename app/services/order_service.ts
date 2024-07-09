@@ -10,18 +10,30 @@ export default class OrderService extends DatabaseService<typeof Order> {
     super(Order)
   }
 
-  async createOrder(user: User, productId: string, data: any ){
-    if(!user){
-        throw new Error('This user is undefined')
+  async createOrder(user: User, data: any) {
+    if (!user) {
+      throw new Error('This user is undefined')
     }
-    const order_product = await this.orderProductService.createOrderProduct(productId, data.quantity)
     const order = await this.store({
-        totalPrice: order_product.price,
-        address: data.address ? data.address : user.address,
-        userId: user.id
+      totalPrice: 0,
+      address: data.address ? data.address : user.address,
+      userId: user.id,
     })
-    order.related('order_product').save(order_product)
-    order_product.related('order').associate(order)
-    return order
+    try {
+      for (let product of data.product_data) {
+        const order_product = await this.orderProductService.createOrderProduct(
+          product.id,
+          product.quantity
+        )
+        order.totalPrice += order_product.price
+        order.related('order_product').save(order_product)
+        order_product.related('order').associate(order)
+      }
+  
+      return await order.save()
+    } catch (error) {
+      await order.delete()
+      throw error
+    }
   }
 }

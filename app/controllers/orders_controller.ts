@@ -2,6 +2,7 @@
 
 import User from '#models/user'
 import OrderService from '#services/order_service'
+import { createOrderValidator } from '#validators/order'
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 
@@ -9,13 +10,21 @@ import { HttpContext } from '@adonisjs/core/http'
 export default class OrdersController {
   constructor(private readonly orderService: OrderService) {}
 
-  async store({ request, params, auth }: HttpContext) {
+  async store({ request, auth }: HttpContext) {
     try {
+      const payload = await createOrderValidator.validate(request.body())
       return await this.orderService.createOrder(
         auth.user as User,
-        params.productId,
-        request.body()
+        payload
       )
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async index() {
+    try {
+      return await this.orderService.findAll()
     } catch (error) {
       throw error
     }

@@ -9,4 +9,13 @@ export const createProductValidator = vine.compile(
       categoryId: vine.string().uuid(),
       picture: vine.array(vine.file())
     })
-  )
+)
+
+export const updateProductValidator = vine.compile(
+    vine.object({
+      name: vine.string().trim().minLength(0).nullable(),
+      description: vine.string().trim().nullable(),
+      price: vine.number().nullable(),
+      quantityInStock: vine.number().nullable(),
+    })
+)
