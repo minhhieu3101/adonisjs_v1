@@ -36,6 +36,16 @@ export default await Env.create(new URL('../', import.meta.url), {
   CACHE_REFRESH_TOKEN_TTL: Env.schema.number(),
 
   CLOUDINARY_API_KEY: Env.schema.string(),
-  CLOUDINARY_API_SECRET : Env.schema.string(),
-  CLOUDINARY_CLOUD_NAME : Env.schema.string()
+  CLOUDINARY_API_SECRET: Env.schema.string(),
+  CLOUDINARY_CLOUD_NAME: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the mail package
+  |----------------------------------------------------------
+  */
+  SMTP_HOST: Env.schema.string(),
+  SMTP_PORT: Env.schema.string(),
+  SMTP_USERNAME: Env.schema.string(),
+  SMTP_PASSWORD: Env.schema.string()
 })

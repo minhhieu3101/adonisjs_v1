@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import type { Authenticators } from '@adonisjs/auth/types'
-import HttpExceptionHandler from '#exceptions/handler'
 import { ModelStatus } from '../../types/enum.js'
 
 /**
@@ -22,7 +21,7 @@ export default class AuthMiddleware {
     } = {}
   ) {
     const user = await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo })
-    if(user.status !== ModelStatus.active){
+    if (user.$original.status !== ModelStatus.active) {
       throw new Error('User is not found')
     }
     return next()

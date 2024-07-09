@@ -28,7 +28,6 @@ export default class ProductsController {
       data.picture = request.files('picture')
       data.quantityInStock = parseInt(data.quantityInStock)
       data.price = parseInt(data.price)
-      console.log(data);
       const payload = await createProductValidator.validate(data)
       return await this.productService.store(payload)
     } catch (error) {
@@ -36,25 +35,38 @@ export default class ProductsController {
     }
   }
 
-  /**
-   * Show individual record
-   */
   async show({ params }: HttpContext) {
     try {
-      return await this.productService.getPictureFromProduct(params.id)
+      return await this.productService.findById(params.id)
     } catch (error) {
       throw error
     }
   }
 
-  /**
-   * Edit individual record
-   */
-  async edit({ params }: HttpContext) {}
+  async getPictureoOfProduct({ params }: HttpContext) {
+    try {
+      return await this.productService.getPictureFromProduct(params.pictureId)
+    } catch (error) {
+      throw error
+    }
+  }
 
-  /**
-   * Handle form submission for the edit action
-   */
+  async getProductFromCategory({ params }: HttpContext) {
+    try {
+      return await this.productService.getProductFromCategory(params.categoryId)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async showAll() {
+    try {
+      return await this.productService.showAll()
+    } catch (error) {
+      throw error
+    }
+  }
+
   async update({ bouncer, response, params, request }: HttpContext) {
     try {
       console.log(params.id)

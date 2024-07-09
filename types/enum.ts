@@ -10,7 +10,14 @@ export enum ModelStatus{
     deleted = 'Deleted'
 }
 
-export enum Status{
+export enum ProductStatus{
     available = 'Available',
-    out_of_stock = 'Out_of_stock'
+    out_of_stock = 'Out_of_stock',
+    unavailable = 'Unavailable'
+}
+
+export enum OrderStatus{
+    pending = 'Pending',
+    processing = 'Processing',
+    cancelled = 'Cancelled'
 }

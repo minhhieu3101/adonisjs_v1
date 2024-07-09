@@ -1,13 +1,14 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
+import { column, hasMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import parseDuration from 'parse-duration'
-import { randomUUID } from 'crypto'
 import { JwtAccessTokenProvider, JwtSecret } from '#providers/jwt_access_token_provider'
 import { ModelStatus, RoleEnum } from '../../types/enum.js'
 import ModelUtil from './model_util.js'
+import Order from './order.js'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -38,7 +39,15 @@ export default class User extends compose(ModelUtil, AuthFinder) {
   declare role: RoleEnum
 
   @column()
+  declare otp: number
+
+  @column()
   declare status: ModelStatus
+
+  @hasMany(() => Order , {
+    foreignKey: 'userId'
+  })
+  declare order: HasMany<typeof Order>
 
   static accessTokens = JwtAccessTokenProvider.forModel(User, {
     expiresInMillis: parseDuration('1 day')!,

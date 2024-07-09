@@ -6,14 +6,18 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.string('id').notNullable()
+      table.string('id').notNullable().unique()
       table.string('full_name').nullable()
       table.string('email', 254).notNullable().unique()
       table.string('password').notNullable()
       table.string('phone_number').notNullable()
       table.string('address').notNullable()
       table.string('role').notNullable().defaultTo(RoleEnum.user)
-      table.string('status').notNullable().defaultTo(ModelStatus.active)
+      table
+        .enu('status', [ModelStatus.active, ModelStatus.inactive, ModelStatus.deleted])
+        .notNullable()
+        .defaultTo(ModelStatus.inactive)
+      table.integer('otp').notNullable()
       table.timestamp('dob').nullable
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()

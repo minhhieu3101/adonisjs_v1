@@ -12,7 +12,7 @@ export default class AuthController {
     try {
         const data = request.body()
         const payload = await registerValidator.validate(data)
-        return await this.userService.store(payload)
+        return await this.userService.register(payload)
     } catch (error) {
         console.log(error);
         

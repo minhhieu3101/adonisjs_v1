@@ -1,18 +1,17 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-import { ProductStatus } from '../../types/enum.js'
+import { OrderStatus } from '../../types/enum.js'
 
 export default class extends BaseSchema {
-  protected tableName = 'products'
+  protected tableName = 'order_products'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.string('id').notNullable().unique()
-      table.string('product_name').notNullable()
-      table.string('description').nullable()
+      table.string('order_id').unsigned().references('orders.id').onDelete('CASCADE')
+      table.string('product_id').unsigned().references('products.id').onDelete('CASCADE')
       table.integer('price').notNullable()
-      table.integer('quantity_in_stock').notNullable()
-      table.string('status').notNullable().defaultTo(ProductStatus.available)
-      table.string('category_id').unsigned().references('categories.id').onDelete('CASCADE')
+      table.integer('quantity').notNullable().defaultTo(1)
+      table.string('order_status').notNullable().defaultTo(OrderStatus.pending)
       table.timestamp('created_at')
       table.timestamp('updated_at')
     })

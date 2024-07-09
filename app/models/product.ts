@@ -2,9 +2,10 @@
 import { belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Category from './category.js'
-import { Status } from '../../types/enum.js'
+import { ProductStatus } from '../../types/enum.js'
 import Picture from './picture.js'
 import ModelUtil from './model_util.js'
+import OrderProduct from './order_product.js'
 
 export default class Product extends ModelUtil {
 
@@ -21,13 +22,18 @@ export default class Product extends ModelUtil {
   declare quantityInStock: number
 
   @column()
-  declare status: Status
+  declare status: ProductStatus
 
   @column({columnName: 'category_id'})
   declare categoryId: string
 
   @belongsTo(() => Category)
   declare category: BelongsTo<typeof Category>
+
+  @hasMany(() => OrderProduct , {
+    foreignKey: 'productId'
+  })
+  declare order_product: HasMany<typeof OrderProduct>
 
   @hasMany(() => Picture , {
     foreignKey: 'productId'
